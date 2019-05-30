@@ -36,6 +36,8 @@ class IPythonKernel(KernelBase):
                      allow_none=True)
     shell_class = Type(ZMQInteractiveShell)
 
+    code_filters = List([], help="List of code filters. They should implent a register(kernel, shell) method").tag(config=True)
+
     use_experimental_completions = Bool(True,
         help="Set this flag to False to deactivate the use of experimental IPython completion APIs.",
     ).tag(config=True)
