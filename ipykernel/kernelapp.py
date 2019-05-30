@@ -97,7 +97,7 @@ To read more about this, see https://github.com/ipython/ipython/issues/2049
 
 class IPKernelApp(BaseIPythonApplication, InteractiveShellApp,
         ConnectionFileMixin):
-    name='ipython-kernel'
+    name='ipython-kernel-elm'
     aliases = Dict(kernel_aliases)
     flags = Dict(kernel_flags)
     classes = [IPythonKernel, ZMQInteractiveShell, ProfileDir, Session]
