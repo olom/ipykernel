@@ -81,6 +81,9 @@ class IPythonKernel(KernelBase):
         for msg_type in comm_msg_types:
             self.shell_handlers[msg_type] = getattr(self.comm_manager, msg_type)
 
+        for filter_hook in self.code_filters:
+            filter_hook.register(self, self.shell)
+
     help_links = List([
         {
             'text': "Python Reference",
