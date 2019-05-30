@@ -265,6 +265,10 @@ class IPythonKernel(KernelBase):
 
         self._forward_input(allow_stdin)
 
+        # XXX FIXME: this should be able to change at least history and silent
+        for filter_hook in self.code_filters:
+            filter_hook.process_run_cell_parameters(code, silent, store_history, user_expressions, allow_stdin)
+
         reply_content = {}
         if hasattr(shell, 'run_cell_async') and hasattr(shell, 'should_run_async'):
             run_cell = shell.run_cell_async
