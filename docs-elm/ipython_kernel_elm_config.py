@@ -15,19 +15,26 @@ class BaseFilter:
         return lines
 
     # This is called from the kernel before feeding input into the IPython Shell
-    def process_run_cell_parameters(self, code, silent, store_history=True, user_expressions=None, allow_stdin=False):
-        pass
+    def process_run_cell(self, code, options):
+        """
+        Modifies the arguments and code passed to shell.run_cell()
+        options is a dict like
+        {
+            'silent': False,
+            'store_history': True,
+            'user_expressions': None
+
+        }
+        that can be modified in place to change behaviour.
+        Returns: the new code to run
+        """
+        return code
 
 
 class SampleFilter(BaseFilter):
     def register(self, kernel, shell):
         super().register(kernel, shell)
 
-        def logger_cmd(info):
-            kernel.log.info('PRE RUN CELL: {}'.format(info))
-            info.raw_cell = 'print(locals())'
-
-        shell.events.register('pre_run_cell', logger_cmd)
         kernel.log.info("FILTER REGISTERED")
 
     def process_text_input(self, lines):
@@ -36,6 +43,13 @@ class SampleFilter(BaseFilter):
             output.append(line.replace('FORBIDDEN_WORD', 'SAFE_WORD'))
 
         return output
+
+    # Simple exclusion from command history, try for example:
+    # In [1]: print('something to exclude... no-history')
+    def process_run_cell(self, code, options):
+        if 'no-history' in code:
+            options['store_history'] = False
+        return code
 
 
 sample_filter = SampleFilter()
