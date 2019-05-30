@@ -360,6 +360,13 @@ class IPythonKernel(KernelBase):
         return reply_content
 
     def do_complete(self, code, cursor_pos):
+        completion_data = self._do_complete(code, cursor_pos)
+        for filter_hook in self.code_filters:
+            completion_data = filter_hook.process_completion(code, cursor_pos, completion_data)
+
+        return completion_data
+
+    def _do_complete(self, code, cursor_pos):
         if _use_experimental_60_completion and self.use_experimental_completions:
             return self._experimental_do_complete(code, cursor_pos)
 

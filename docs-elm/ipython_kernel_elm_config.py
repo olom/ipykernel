@@ -30,6 +30,21 @@ class BaseFilter:
         """
         return code
 
+    # This is called from the kernel before returning completion data
+    def process_completion(self, code, cursor_pos, completion_data):
+        """
+        This is called from the kernel before returning completion data
+        completion_data is a dict like
+        {
+            'matches' : matches,
+            'cursor_end' : cursor_pos,
+            'cursor_start' : cursor_pos - len(txt),
+            'metadata' : {},
+            'status' : 'ok'
+        }
+        """
+        return completion_data
+
 
 class SampleFilter(BaseFilter):
     def register(self, kernel, shell):
