@@ -1,3 +1,7 @@
+import os.path
+import tempfile
+import logging
+
 c = get_config()    # noqa - defined by traitlets
 
 
@@ -50,13 +54,31 @@ class SampleFilter(BaseFilter):
     def register(self, kernel, shell):
         super().register(kernel, shell)
 
-        kernel.log.info("FILTER REGISTERED")
+        ident = kernel.ident
+
+        logfile = os.path.join(tempfile.gettempdir(), 'elm-kernel-{}.log'.format(ident))
+
+        logger = self.logger = logging.getLogger('elm-kernel-{}'.format(ident))
+        fh = self.fh = logging.FileHandler(logfile)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+        logger.setLevel(logging.INFO)
+        logger.info('STARTED ELM SESSION {}'.format(ident))
+
+        kernel.log.info("FILTER REGISTERED for elm-kernel {}".format(ident))
+        kernel.log.info("LOGGING USER INTERACTIONS TO {}".format(logfile))
 
     def process_text_input(self, lines):
         output = []
         for line in lines:
-            output.append(line.replace('FORBIDDEN_WORD', 'SAFE_WORD'))
+            self.logger.info('LINE INPUT FROM USER: {}'.format(repr(line)))
+            if 'FORBIDDEN_WORD' in line:
+                line = line.replace('FORBIDDEN_WORD', 'SAFE_WORD')
+                self.logger.info('LINE INPUT FROM USER: "FORBIDDEN_WORD" found, replacing with "SAFE_WORD"')
+            output.append(line)
 
+        self.fh.flush()
         return output
 
     # Simple exclusion from command history, try for example:
@@ -64,7 +86,14 @@ class SampleFilter(BaseFilter):
     def process_run_cell(self, code, options):
         if 'no-history' in code:
             options['store_history'] = False
+            self.logger.info('RUN CODE, excluded from command history: {}'.format(repr(code)))
+            self.fh.flush()
         return code
+
+    def process_completion(self, code, cursor_pos, completion_data):
+        self.logger.info('COMPLETION REQUESTED FOR: {}'.format(repr(code)))
+        self.fh.flush()
+        return completion_data
 
 
 sample_filter = SampleFilter()
