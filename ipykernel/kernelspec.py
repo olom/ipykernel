@@ -54,7 +54,7 @@ def get_kernel_dict(extra_arguments=None):
     """Construct dict for kernel.json"""
     return {
         'argv': make_ipkernel_cmd(extra_arguments=extra_arguments),
-        'display_name': 'ELM (Python %i)' % sys.version_info[0],
+        'display_name': 'ELM (Python {}) {}'.format(sys.version_info[0], '20190531T225000'),
         'language': 'python',
     }
 
