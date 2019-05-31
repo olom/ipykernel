@@ -6,6 +6,10 @@ c = get_config()    # noqa - defined by traitlets
 
 
 class BaseFilter:
+    """
+    This is the reference implementation for all filters/hooks.
+    Just passes the data as-is without changing it.
+    """
     def register(self, kernel, shell):
         self.kernel = kernel
         self.shell = shell
