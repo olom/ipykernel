@@ -54,6 +54,7 @@ class BaseFilter:
         self.kernel = kernel
         self.shell = shell
 
+        shell.events.register('post_run_cell', self.post_run_cell)
         shell.input_transformers_cleanup.append(self.process_text_input)
 
         # You can also perform more advanced modifications, see:
@@ -92,6 +93,12 @@ class BaseFilter:
         }
         """
         return completion_data
+
+    def post_run_cell(self, result):
+        """
+        This is called after executing a cell with the result of that
+        """
+        pass
 ```
 
 We added another configurable trait to IPythonKernel, code_filters. It is a list of filter instances.
