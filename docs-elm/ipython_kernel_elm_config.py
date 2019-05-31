@@ -96,6 +96,8 @@ class SampleFilter(BaseFilter):
 
     def process_completion(self, code, cursor_pos, completion_data):
         self.logger.info('COMPLETION REQUESTED FOR: {}'.format(repr(code)))
+        self.logger.info('COMPLETION RESULTS: {}'.format(completion_data['matches']))
+        completion_data['matches'].insert(0, 'some-new-suggestion')
         self.fh.flush()
         return completion_data
 
