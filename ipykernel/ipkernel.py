@@ -36,6 +36,8 @@ class IPythonKernel(KernelBase):
                      allow_none=True)
     shell_class = Type(ZMQInteractiveShell)
 
+    code_filters = List([], help="List of code filters. They should implent a register(kernel, shell) method").tag(config=True)
+
     use_experimental_completions = Bool(True,
         help="Set this flag to False to deactivate the use of experimental IPython completion APIs.",
     ).tag(config=True)
@@ -78,6 +80,9 @@ class IPythonKernel(KernelBase):
         comm_msg_types = [ 'comm_open', 'comm_msg', 'comm_close' ]
         for msg_type in comm_msg_types:
             self.shell_handlers[msg_type] = getattr(self.comm_manager, msg_type)
+
+        for filter_hook in self.code_filters:
+            filter_hook.register(self, self.shell)
 
     help_links = List([
         {
@@ -260,6 +265,17 @@ class IPythonKernel(KernelBase):
 
         self._forward_input(allow_stdin)
 
+        for filter_hook in self.code_filters:
+            options = {
+                'silent': silent,
+                'store_history': store_history,
+                'user_expressions': user_expressions
+            }
+            code = filter_hook.process_run_cell(code, options)
+            silent = options.get('silent', silent)
+            store_history = options.get('store_history', store_history)
+            user_expressions = options.get('user_expressions', user_expressions)
+
         reply_content = {}
         if hasattr(shell, 'run_cell_async') and hasattr(shell, 'should_run_async'):
             run_cell = shell.run_cell_async
@@ -344,6 +360,13 @@ class IPythonKernel(KernelBase):
         return reply_content
 
     def do_complete(self, code, cursor_pos):
+        completion_data = self._do_complete(code, cursor_pos)
+        for filter_hook in self.code_filters:
+            completion_data = filter_hook.process_completion(code, cursor_pos, completion_data)
+
+        return completion_data
+
+    def _do_complete(self, code, cursor_pos):
         if _use_experimental_60_completion and self.use_experimental_completions:
             return self._experimental_do_complete(code, cursor_pos)
 

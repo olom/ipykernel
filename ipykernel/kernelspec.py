@@ -16,7 +16,7 @@ from jupyter_client.kernelspec import KernelSpecManager
 
 pjoin = os.path.join
 
-KERNEL_NAME = 'python%i' % sys.version_info[0]
+KERNEL_NAME = 'elm-python%i' % sys.version_info[0]
 
 # path to kernelspec resources
 RESOURCES = pjoin(os.path.dirname(__file__), 'resources')
@@ -54,7 +54,7 @@ def get_kernel_dict(extra_arguments=None):
     """Construct dict for kernel.json"""
     return {
         'argv': make_ipkernel_cmd(extra_arguments=extra_arguments),
-        'display_name': 'Python %i' % sys.version_info[0],
+        'display_name': 'ELM (Python {}) {}'.format(sys.version_info[0], '20190531T225000'),
         'language': 'python',
     }
 
