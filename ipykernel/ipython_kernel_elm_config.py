@@ -14,6 +14,7 @@ class BaseFilter:
         self.kernel = kernel
         self.shell = shell
 
+        shell.events.register('post_run_cell', self.post_run_cell)
         shell.input_transformers_cleanup.append(self.process_text_input)
 
         # You can also perform more advanced modifications, see:
@@ -52,6 +53,12 @@ class BaseFilter:
         }
         """
         return completion_data
+
+    def post_run_cell(self, result):
+        """
+        This is called after executing a cell with the result of that
+        """
+        pass
 
 
 class SampleFilter(BaseFilter):
@@ -100,6 +107,13 @@ class SampleFilter(BaseFilter):
         completion_data['matches'].insert(0, 'some-new-suggestion')
         self.fh.flush()
         return completion_data
+
+    def post_run_cell(self, result):
+        """
+        This is called after executing a cell with the result of that
+        """
+        self.logger.info('CELL EXECUTION RESULT: {}'.format(repr(result)))
+        self.logger.info('CELL EXECUTION RESULT OUTPUT: {}'.format(repr(result.result)))
 
 
 sample_filter = SampleFilter()
