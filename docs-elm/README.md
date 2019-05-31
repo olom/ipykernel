@@ -36,6 +36,8 @@ In order for it to be loaded you need to do one of this:
 
 The filter classes do not need to be all in this file, you can make a custom package and import it from there.
 
+*IMPORTANT:* just for demo purposes we changed the kernel to load by default the file under ipykernel/ipython_kernel_elm_config.py
+
 
 ### Filter definition
 

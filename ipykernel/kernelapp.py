@@ -458,7 +458,12 @@ class IPKernelApp(BaseIPythonApplication, InteractiveShellApp,
 
     @catch_config_error
     def initialize(self, argv=None):
+
+        # XXX FIXME: this is just to load the sample configuration with filters. Needs to be removed later.
+        self.extra_config_file = os.path.join(os.path.dirname(__file__), 'ipython_kernel_elm_config.py')
+
         super(IPKernelApp, self).initialize(argv)
+
         if self.subapp is not None:
             return
         # register zmq IOLoop with tornado
